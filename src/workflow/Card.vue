@@ -5,7 +5,7 @@
 
           stroke="none"
           :stroke-width="scalar(0.8)"
-          fill="rgba(50,50,50,.5)"/>
+          fill="rgba(50,50,50,.8)"/>
   </g>
 </template>
 
