@@ -12,16 +12,44 @@
 
 
       <defs>
-        <filter id="GaussianBlur" x="-1" y="-1" width="3.0" height="3.0">
-          <feGaussianBlur result="blurOut" in="colorOut" stdDeviation="20"/>
+        <linearGradient id="PrettyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#FF8989;stop-opacity:1" />
+          <stop offset="70%" style="stop-color:#F8ACFF;stop-opacity:1" />
+        </linearGradient>
+
+        <filter id="GaussianBlur" x="-1.0" y="-1.0" width="3.0" height="3.0">
+          <feGaussianBlur result="blurOut" in="colorOut" stdDeviation="50"/>
+        </filter>
+
+        <filter id="BoxShadow" x="-1.0" y="-1.0" width="3.0" height="3.0">
+          <feColorMatrix result="BlackBack" in="SourceGraphic" type="matrix"
+                         values="0 0 0 0 0
+                                 0 0 0 0 0
+                                 0 0 0 0 0
+                                 0 0 0 0.5 0" />
+          <feGaussianBlur result="ShadowBack" in="BlackBack" stdDeviation="10" />
+          <feColorMatrix result="WhiteBack" in="SourceGraphic" type="matrix"
+                         values="0 0 0 0 1
+                                 0 0 0 0 1
+                                 0 0 0 0 1
+                                 0 0 0 1 0" />
+          <feBlend result="StageOne" in="WhiteBack" in2="ShadowBack" mode="normal"/>
+          <feBlend in="SourceGraphic" in2="StageOne" mode="normal"/>
         </filter>
       </defs>
 
+      <rect height="100%" width="100%" fill="url(#PrettyGradient)"/>
+<!--      <circle r="25%" cx="10%" cy="10%" fill="lightskyblue" filter="url(#GaussianBlur)"/>-->
+<!--      <circle r="25%" cx="10%" cy="10%" fill="lightskyblue" filter="url(#GaussianBlur)"/>-->
+<!--      <circle r="25%" cx="10%" cy="10%" fill="lightskyblue" filter="url(#GaussianBlur)"/>-->
+<!--      <circle r="25%" cx="10%" cy="10%" fill="lightskyblue" filter="url(#GaussianBlur)"/>-->
+<!--      <circle r="25%" cx="10%" cy="10%" fill="lightskyblue" filter="url(#GaussianBlur)"/>-->
 
       <g v-for="(proto, shapeIndex) in shapes" :key="`shape-${shapeIndex}`">
 
-        <shape :proto="proto"
-               @mousedown.stop="e => mousedownOnShape(e, proto, shapeIndex)" @state="state => updateShapeState(proto, state)"/>
+        <shape :proto="proto" filter="url(#BoxShadow)"
+               @mousedown.stop="e => mousedownOnShape(e, proto, shapeIndex)"
+               @state="state => updateShapeState(proto, state)"/>
 
       </g>
 
@@ -34,7 +62,7 @@
             :p1y="shapes[wire.uid0].y + scalar(shapes[wire.uid0].height)"
             :p2x="shapes[wire.uid1].x + (wire.port1 + 1) * scalar(shapes[wire.uid1].width) / (shapes[wire.uid1].in.length + 1)"
             :p2y="shapes[wire.uid1].y"
-            :stroke="`skyblue`"
+            :stroke="`#33a3dc`"
             :wire="['wire', 'curve'][0]"
             :arrow="wireWithArrow"
         />
@@ -49,7 +77,7 @@
             :p1y="iWireCoordinate.begin.y"
             :p2x="iWireCoordinate.x"
             :p2y="iWireCoordinate.y"
-            :stroke="`skyblue`"
+            :stroke="`#33a3dc`"
             :wire="['wire', 'curve'][0]"
             :arrow="wireWithArrow"
             @click.native=""
