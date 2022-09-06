@@ -1,14 +1,14 @@
 <template>
-  <palette />
+  <VisionGraph />
 </template>
 
 <script>
-import Palette from "@/workflow/Palette";
+import VisionGraph from "@/workflow/VisionGraph";
 
 export default {
   name: 'App',
   components: {
-    Palette,
+    VisionGraph,
   }
 }
 </script>
@@ -20,7 +20,7 @@ export default {
 }
 
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+  font-family: "微软雅黑", Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

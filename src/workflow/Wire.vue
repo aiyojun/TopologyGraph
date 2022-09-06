@@ -12,6 +12,8 @@
 
 <script>
 
+import Matrix from "@/utils/Matrix"
+
 export default {
   name: "Wire",
   props: {
@@ -24,17 +26,57 @@ export default {
     scale      : { type: Number, default: 1 },
     delta      : { type: Number, default: 30 },
     stroke     : { type: String, default: 'white' },
-    strokeWidth: { type: Number, default: 2 },
+    strokeWidth: { type: Number, default: 1.2 },
     edge       : { type: Number, default: 6 },
     wire       : { type: String, default: 'wire' },
     arrow      : { type: Boolean, default: false },
   },
   methods: {
+    vector2degree(vec) {
+      if (vec[0] > 0 && vec[1] >= 0) {
+        return Math.atan(vec[1] / vec[0])
+      } else if (vec[0] > 0 && vec[1] <= 0) {
+        return Math.atan(vec[1] / vec[0]) + Math.PI * 2
+      } else if (vec[0] < 0 && vec[1] >= 0) {
+        return Math.atan(vec[1] / vec[0]) + Math.PI
+      } else if (vec[0] < 0 && vec[1] <= 0) {
+        return Math.atan(vec[1] / vec[0]) + Math.PI
+      } else if (vec[0] === 0 && vec[1] > 0) {
+        return Math.PI / 2
+      } else if (vec[0] === 0 && vec[1] < 0) {
+        return Math.PI / 2 + Math.PI
+      } else {
+        return 0
+      }
+    },
     drawArrow() {
-      return `M${this.p2x - 8} ${this.p2y - 16}`
-          + `L${this.p2x + 0} ${this.p2y - 0}`
-          + `L${this.p2x + 8} ${this.p2y - 16}`
-          + `L${this.p2x + 0} ${this.p2y - 12}`
+      let point1 = [this.p1x, this.p1y];
+      let point2 = [this.p2x, this.p2y];
+      let p2x = this.p2x === null ? this.p1x : this.p2x;
+      let p2y = this.p2y === null ? this.p1y : this.p2y;
+      const edge2 = 100 * this.scale;
+      if (this.wire === 'curve') {
+        if (this.p1dir === 'right' && this.p2dir === 'left' && this.p1x <= p2x) {
+          return this.makeArrow(- Math.PI / 2)
+        } else if (this.p1dir === 'right' && this.p2dir === 'left' && this.p1x > p2x) {
+          return this.makeArrow(Math.PI / 2 + this.vector2degree([-edge2, ((point1[1] + point2[1]) / 2 + point2[1]) / 2 - point2[1]]))
+        }
+      }
+      if (this.p1dir === 'up' && this.p2dir === 'down') {
+        return this.makeArrow(0);
+      } else if (this.p1dir === 'right' && this.p2dir === 'left') {
+        return this.makeArrow(- Math.PI / 2);
+      }
+    },
+    makeArrow(alpha, factor = 1) {
+      const p0 = Matrix.rotate([-8 * this.scale * factor, -16 * this.scale * factor], alpha)
+      const p1 = Matrix.rotate([ 8 * this.scale * factor, -16 * this.scale * factor], alpha)
+      const p2 = Matrix.rotate([ 0, -12 * this.scale * factor], alpha)
+      const p3 = Matrix.rotate([ 0, 0], alpha)
+      return `M${this.p2x + p0[0]} ${this.p2y + p0[1]}`
+          + `L${this.p2x + p3[0]} ${this.p2y + p3[1]}`
+          + `L${this.p2x + p1[0]} ${this.p2y + p1[1]}`
+          + `L${this.p2x + p2[0]} ${this.p2y + p2[1]}`
           + `Z`;
     },
     drawPath() {
@@ -60,10 +102,31 @@ export default {
         // if (this.p1dir === 'down' && this.p2dir === 'up' && this.p1y >= this.p2y) {
         let point1 = [this.p1x, this.p1y];
         let point2 = [this.p2x, this.p2y];
-        path = `M${point1[0]} ${point1[1]} ` +
-            `C${point1[0]} ${(point1[1] + point2[1]) / 2}` +
-            ` ${point2[0]} ${(point1[1] + point2[1]) / 2}` +
-            ` ${point2[0]} ${point2[1]}`
+        const edge2 = 100 * this.scale;
+        if (this.p1dir === 'right' && this.p2dir === 'left' && this.p1x <= p2x) {
+          path = `M${point1[0]} ${point1[1]} ` +
+              `C${(point1[0] + point2[0]) / 2} ${point1[1]}` +
+              ` ${(point1[0] + point2[0]) / 2} ${point2[1]}` +
+              ` ${point2[0]} ${point2[1]}`
+        } else if (this.p1dir === 'right' && this.p2dir === 'left' && this.p1x > p2x) {
+          // const pk = (point2[1] - point1[1]) / 2 / 3
+          // const yd_4 =
+          // const pk = 0
+          path = `M${point1[0]} ${point1[1]} ` +
+              // `C${point1[0] + edge2} ${point1[1] + pk}` +
+              `Q${point1[0] + edge2} ${((point1[1] + point2[1]) / 2 + point1[1]) / 2}` +
+              ` ${(point1[0] + point2[0]) / 2} ${(point1[1] + point2[1]) / 2} ` +
+              `M${(point1[0] + point2[0]) / 2} ${(point1[1] + point2[1]) / 2} ` +
+              `Q${point2[0] - edge2} ${((point1[1] + point2[1]) / 2 + point2[1]) / 2}` +
+              // ` ${point2[0] - edge2} ${point2[1] + pk}` +
+              ` ${point2[0]} ${point2[1]}`
+        } else {
+          path = `M${point1[0]} ${point1[1]} ` +
+              `C${point1[0]} ${(point1[1] + point2[1]) / 2}` +
+              ` ${point2[0]} ${(point1[1] + point2[1]) / 2}` +
+              ` ${point2[0]} ${point2[1]}`
+        }
+
         ;
         // }
       } else if (this.wire === 'wire') {
@@ -88,9 +151,25 @@ export default {
         } else if (this.p1dir === 'left' && this.p2dir === 'right' && this.p1x > p2x) {
           path = `M${this.p1x} ${this.p1y} L${pmr[0] + edge} ${p1r[1]} L${pmr[0]} ${p1r[1] + edge * (this.p1y <= p2y ? 1 : -1)} L${pmr[0]} ${p2r[1] - edge * (this.p1y <= p2y ? 1 : -1)} L${pmr[0] - edge} ${p2r[1]} L${p2x} ${p2y}`;
         } else if (this.p1dir === 'right' && this.p2dir === 'left' && this.p1x <= p2x) {
-          path = `M${this.p1x} ${this.p1y} L${pmr[0] - edge} ${p1r[1]} L${pmr[0]} ${p1r[1] + edge * (this.p1y <= p2y ? 1 : -1)} L${pmr[0]} ${p2r[1] - edge * (this.p1y <= p2y ? 1 : -1)} L${pmr[0] + edge} ${p2r[1]} L${p2x} ${p2y}`;
+          // path = `M${this.p1x} ${this.p1y} L${pmr[0] - edge} ${p1r[1]} L${pmr[0]} ${p1r[1] + edge * (this.p1y <= p2y ? 1 : -1)} L${pmr[0]} ${p2r[1] - edge * (this.p1y <= p2y ? 1 : -1)} L${pmr[0] + edge} ${p2r[1]} L${p2x} ${p2y}`;
+          path = `M${this.p1x} ${this.p1y} `
+              + `L${pmr[0] - edge} ${p1r[1]} `
+              + `L${pmr[0]} ${p1r[1] + edge * (this.p1y <= p2y ? 1 : -1)} `
+              + `L${pmr[0]} ${p2r[1] - edge * (this.p1y <= p2y ? 1 : -1)} `
+              + `L${pmr[0] + edge} ${p2r[1]} `
+              + `L${p2x} ${p2y}`;
         } else if (this.p1dir === 'right' && this.p2dir === 'left' && this.p1x > p2x) {
-          path = `M${this.p1x} ${this.p1y} L${p1r[0] - edge} ${p1r[1]} L${p1r[0]} ${p1r[1] + edge * (this.p1y <= p2y ? 1 : -1)} L${p1r[0]} ${pmr[1] - edge * (this.p1y <= p2y ? 1 : -1)} L${p1r[0] - edge} ${pmr[1]} L${p2r[0] + edge} ${pmr[1]} L${p2r[0]} ${pmr[1] + edge * (this.p1y <= p2y ? 1 : -1)} L${p2r[0]} ${p2r[1] - edge * (this.p1y <= p2y ? 1 : -1)} L${p2r[0] + edge} ${p2r[1]} L${p2x} ${p2y}`;
+          // path = `M${this.p1x} ${this.p1y} L${p1r[0] - edge} ${p1r[1]} L${p1r[0]} ${p1r[1] + edge * (this.p1y <= p2y ? 1 : -1)} L${p1r[0]} ${pmr[1] - edge * (this.p1y <= p2y ? 1 : -1)} L${p1r[0] - edge} ${pmr[1]} L${p2r[0] + edge} ${pmr[1]} L${p2r[0]} ${pmr[1] + edge * (this.p1y <= p2y ? 1 : -1)} L${p2r[0]} ${p2r[1] - edge * (this.p1y <= p2y ? 1 : -1)} L${p2r[0] + edge} ${p2r[1]} L${p2x} ${p2y}`;
+          path = `M${this.p1x} ${this.p1y} `
+              + `L${p1r[0] - edge} ${p1r[1]} `
+              + `L${p1r[0]} ${p1r[1] + edge * (this.p1y <= p2y ? 1 : -1)} `
+              + `L${p1r[0]} ${pmr[1] - edge * (this.p1y <= p2y ? 1 : -1)} `
+              + `L${p1r[0] - edge} ${pmr[1]} `
+              + `L${p2r[0] + edge} ${pmr[1]} `
+              + `L${p2r[0]} ${pmr[1] + edge * (this.p1y <= p2y ? 1 : -1)} `
+              + `L${p2r[0]} ${p2r[1] - edge * (this.p1y <= p2y ? 1 : -1)} `
+              + `L${p2r[0] + edge} ${p2r[1]} `
+              + `L${p2x} ${p2y}`;
         } else if (this.p1dir === 'up' && this.p2dir === 'down' && this.p1y < p2y) {
           path = `M${this.p1x} ${this.p1y} `
               +`L${p1r[0]} ${p1r[1] + edge} `
