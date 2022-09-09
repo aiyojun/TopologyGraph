@@ -2,10 +2,12 @@ export default {
     MachineVision: 'Machine vision',
     graphMenu: {
         createNode: 'Create node',
+        removeNode: 'Remove node',
         createRing: 'Create ring',
-        hidePorts: 'Hide ports',
+        hidePorts: 'Hide all ports',
         showPorts: 'Show ports',
         switchLang: 'Switch to Chinese',
+        clearShapes: 'Clear graph',
     },
     vision: {
         Preprocessing: 'Preprocess',

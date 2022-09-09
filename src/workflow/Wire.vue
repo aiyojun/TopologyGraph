@@ -49,6 +49,12 @@ export default {
         return 0
       }
     },
+    degreeMap1(alpha) {
+      return (Math.abs(alpha) < (Math.PI / 4)) ? 0 : (-1 * Math.cos(2 * alpha - Math.PI / 2) * Math.PI / 2 + Math.PI / 2)
+    },
+    degreeMap2(alpha) {
+      return (Math.abs(alpha) < (Math.PI / 4)) ? (Math.PI) : (-1 * Math.cos(2 * alpha - Math.PI / 2) * Math.PI / 2 + Math.PI / 2)
+    },
     drawArrow() {
       let point1 = [this.p1x, this.p1y];
       let point2 = [this.p2x, this.p2y];
@@ -57,7 +63,14 @@ export default {
       const edge2 = 100 * this.scale;
       if (this.wire === 'curve') {
         if (this.p1dir === 'right' && this.p2dir === 'left' && this.p1x <= p2x) {
-          return this.makeArrow(- Math.PI / 2)
+          if (this.p1x === p2x) {
+            return this.p1y < p2y ? this.makeArrow(0) : this.makeArrow(Math.PI);
+          } else {
+            return this.p1y < p2y
+                ? this.makeArrow(- Math.PI / 2 + this.degreeMap1(Math.atan((p2y - this.p1y) / (p2x - this.p1x))))
+                : this.makeArrow(  Math.PI / 2 + this.degreeMap2(Math.atan((p2y - this.p1y) / (p2x - this.p1x))))
+            ;
+          }
         } else if (this.p1dir === 'right' && this.p2dir === 'left' && this.p1x > p2x) {
           return this.makeArrow(Math.PI / 2 + this.vector2degree([-edge2, ((point1[1] + point2[1]) / 2 + point2[1]) / 2 - point2[1]]))
         }

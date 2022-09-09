@@ -1,0 +1,10 @@
+<?xml version="1.0" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg class="icon" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+stroke-linecap="round">
+    <linearGradient id="PrettyGradient2" x1="0%" y1="0%" x2="0" y2="100%">
+        <stop offset="0%"  style="stop-color:#dddddd; stop-opacity:1" />
+        <stop offset="70%" style="stop-color:#888888; stop-opacity:1" />
+    </linearGradient>
+    <rect x="8" y="6" rx="1.9" ry="1.9" width="3.8" height="12" fill="url(#PrettyGradient2)"/>
+    <rect x="16" y="6" rx="1.9" ry="1.9" width="3.8" height="12" fill="url(#PrettyGradient2)"/>
+</svg>

@@ -2,7 +2,7 @@
   <g xmlns="http://www.w3.org/2000/svg">
 <!--    :stroke="border" :stroke-width="borderWidth * scale"-->
     <circle :cx="cx" :cy="cy" :r="r * scale"
-            :fill="'rgba(255,255,255,.3)'"
+            :fill="'rgba(41, 182, 242,1)'"
             @mouseover="zoom_in"
             @mouseout="zoom_out"
             class="port"
@@ -15,9 +15,9 @@ export default {
   name: "Port",
   data() {
     return {
-      r: 6,
+      r: 4,
       borderWidth: 2,
-      ratio: 1.6,
+      ratio: 2,
     };
   },
   props: {

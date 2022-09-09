@@ -6,7 +6,7 @@
       :width="edge" :height="edge"
       :style="{transform: `rotate(${value ? `${degree}` : '0'}deg)`}"
       @click="switchState"
-      stroke="#000" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"
+      :stroke="color" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter"
       fill="none" color="#000">
     <polyline points="10 6 16 12 10 18 10 18"/>
   </svg>
@@ -16,6 +16,7 @@
 export default {
   name: "opener",
   props: {
+    color: {type: String, default: '#000'},
     edge : {type: Number , default: 24},
     value: {type: Boolean, default: true},
     degree: {type: Number , default: 90},

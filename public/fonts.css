@@ -1,0 +1,8 @@
+@font-face {  font-family: 'Quicksand';  font-weight: normal;  src: url("src/font/Quicksand_Light.otf") format('otf');  }
+@font-face {  font-family: 'Quicksand';  font-weight: bold;  src: url("src/font/Quicksand_Bold.otf") format('otf');  }
+
+@font-face {  font-family: 'Roboto';  font-weight: normal;  src: url("src/font/RobotoLight-aW3R.ttf") format('ttf');  }
+@font-face {  font-family: 'Roboto';  font-weight: bold;  src: url("src/font/RobotoBold-Xdoj.ttf") format('ttf');  }
+@font-face {  font-family: 'Roboto';  font-weight: bold;  font-style: italic;  src: url("src/font/RobotoBoldItalic-4e0x.ttf") format('ttf');  }
+@font-face {  font-family: 'Roboto';  font-style: italic;  src: url("src/font/RobotoLight-aW3R.ttf") format('ttf');  }
+@font-face {  font-family: 'Roboto';  font-weight: normal;  font-style: italic;  src: url("src/font/RobotoLightItalic-E9nn.ttf") format('ttf');  }

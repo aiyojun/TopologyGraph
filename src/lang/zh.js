@@ -2,10 +2,12 @@ export default {
     MachineVision: '机器视觉',
     graphMenu: {
         createNode: '创建节点',
+        removeNode: '删除节点',
         createRing: '创建圆环',
-        hidePorts: '隐藏端口',
+        hidePorts: '隐藏所有端口',
         showPorts: '显示端口',
         switchLang: '切换为英文',
+        clearShapes: '清空图层',
     },
     vision: {
         Preprocessing: '预处理',
