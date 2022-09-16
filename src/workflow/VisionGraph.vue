@@ -1,11 +1,13 @@
 <template>
   <div class="top-layer">
+
     <svg xmlns="http://www.w3.org/2000/svg" class="svg-layer"
+         @drop="dropSelectedOne"
+         @dragover="e => e.preventDefault()"
          @mousedown.stop="mousedownOnGraph"
          @mouseup="mouseupOnGraph"
          @contextmenu="e => e.preventDefault()"
          @mousemove.stop="mousemoveOnGraph">
-
 
       <defs>
         <linearGradient id="PrettyGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -62,11 +64,36 @@
           <feGaussianBlur result="ShadowBack" in="BlackBack" stdDeviation="10" />
           <feBlend in="Empty" in2="ShadowBack" mode="normal"/>
         </filter>
+
+        <pattern id="smallGrid" width="10" height="10" patternUnits="userSpaceOnUse">
+          <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(207, 207, 207, 0.3)" stroke-width="1"></path>
+        </pattern>
+        <pattern id="bigGrid" width="50" height="50" patternUnits="userSpaceOnUse">
+          <rect width="50" height="50" fill="url(#smallGrid)"></rect>
+          <path d="M 50 0 L 0 0 0 50" fill="none" stroke="rgba(186, 186, 186, 0.5)" stroke-width="1"></path>
+        </pattern>
+        <pattern id="gridEdge" width="800" height="800" patternUnits="userSpaceOnUse">
+          <path d="M 800 0 L 800 800 0 800" fill="none" stroke="rgba(186, 186, 186, 0.5)" stroke-width="1"></path>
+        </pattern>
+        <pattern id="grid" width="800" height="800" patternUnits="userSpaceOnUse">
+          <rect width="800" height="800" fill="url(#bigGrid)"></rect>
+          <rect width="800" height="800" fill="url(#gridEdge)"></rect>
+        </pattern>
+
       </defs>
 
 
-      <rect height="100%" width="100%" fill="url(#PrettyGradient3)"/>
+      <g>
+        <rect width="100%" height="100%" fill="#FFF"/>
+<!--        <rect x="400" y="100" height="800" width="800" fill="url(#grid)"/>-->
+        <rect height="800" width="800" fill="url(#grid)"/>
+<!--        <path d="M 1200 0 L 1200 1200 0 1200" fill="none" stroke="rgba(186, 186, 186, 0.5)" stroke-width="1"></path>-->
+      </g>
+
+<!--      <rect height="100%" width="100%" fill="url(#PrettyGradient3)"/>-->
 <!--      <rect height="100%" width="100%" fill="#EEE6FF"/>-->
+<!--      <rect width="100%" height="100%" fill="#FFF"/>-->
+<!--      <rect width="100%" height="100%" fill="url(#grid)"></rect>-->
 
 <!--      <foreignObject xmlns="http://www.w3.org/1999/xhtml" height="100%" width="100%" style="pointer-events: none;user-select: none;">-->
 <!--        <div style="position: absolute; top: -30px; right: 0; user-select: none;">-->
@@ -171,10 +198,10 @@
 
     <div v-if="menu.visible" :key="`menu`" class="menu" :style="{position: 'absolute', left: `${menu.iCoordinate.x}px`, top: `${menu.iCoordinate.y}px`}">
       <ul class="menu-layer">
-        <li class="menu-option" @click="_ => clickMenuOption('createNode')">
-          <span class="menu-option-icon"></span>
-          <span class="menu-option-text">{{ $t('graphMenu.createNode') }}</span>
-        </li>
+<!--        <li class="menu-option" @click="_ => clickMenuOption('createNode')">-->
+<!--          <span class="menu-option-icon"></span>-->
+<!--          <span class="menu-option-text">{{ $t('graphMenu.createNode') }}</span>-->
+<!--        </li>-->
         <li class="menu-option" @click="_ => clickMenuOption('removeNode')" v-if="menu.onNode">
           <span class="menu-option-icon"></span>
           <span class="menu-option-text">{{ $t('graphMenu.removeNode') }}</span>
@@ -205,23 +232,41 @@
 
     </div>
 
-    <div style="position:absolute;top: 0; left: 0; width: 200px; background-color: rgba(23,24,25,.2); padding:5px 5px 5px 20px;" @mouseup="e => {e.stopPropagation();forceTaskDone();}">
-      <div v-for="(group, groupIndex) in visionModules">
-        <div><span class="float-title" style="font-weight: bold;">{{$t(`vision.${group.name}`)}}</span></div>
-        <div v-for="(module, moduleIndex) in group.modules" :key="moduleIndex"
-             style="position: relative"
-             draggable="true">
-<!--          <div style="width: 100%; height: 58px;display: flex;justify-content: center;align-items: center;">-->
-<!--            <img alt="" style="max-height: 70%;pointer-events: none;" :src="`vision/${module.icon}`"/>-->
-<!--          </div>-->
-            <div v-if="module.name === selectedOne" class="selected-arrow">
-              <Opener degree="0" edge="18" color="#fff"/>
+    <div draggable="false" style="position:absolute; top: 0; bottom: 0; left: 1px; width: 332px; overflow-y: auto; background-color: #fff; box-shadow: 1px 0 2px rgba(23,24,25,.2); padding-left: 5px;">
+      <div v-for="(group, groupIndex) in visionModules" draggable="false">
+        <div style="margin-bottom: 5px;margin-top: 5px;" draggable="false">
+          <span class="float-title" style="font-weight: bold; color: #707070;">{{$t(`vision.${group.name}`)}}</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 160px 160px; grid-gap: 5px;" draggable="false">
+          <div v-for="(module, moduleIndex) in group.modules" :key="moduleIndex"
+               style="display: flex; flex-direction: column; width: 160px; height: 60px; box-shadow: 0 1px 5px rgba(23,24,25,.2); border-radius: 8px;"
+               draggable="true" @dragstart="dragOne(module.name)">
+            <div style="width: 100%; height: 24px; margin: 5px 0 0 10px;">
+              <img style="width: 24px;height: 24px; cursor: grabbing;" :src="`vision/${module.icon}`" alt="">
             </div>
-            <span class="float-font"
-                  @click="e => {selectOne(module.name)}">{{`${moduleIndex+1}`}}. {{$t(`vision.${module.name}`)}}</span>
+            <div style="width: 100%; margin: 5px 0 0 10px;">
+              <span class="vision-node">{{$t(`vision.${module.name}`)}}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
+
+<!--    <div style="position:absolute;top: 0; left: 0; width: 200px; background-color: rgba(23,24,25,.2); padding:5px 5px 5px 20px;" @mouseup="e => {e.stopPropagation();forceTaskDone();}">-->
+<!--      <div v-for="(group, groupIndex) in visionModules">-->
+<!--        <div><span class="float-title" style="font-weight: bold;">{{$t(`vision.${group.name}`)}}</span></div>-->
+<!--        <div v-for="(module, moduleIndex) in group.modules" :key="moduleIndex"-->
+<!--             style="position: relative"-->
+<!--             draggable="true">-->
+<!--            <div v-if="module.name === selectedOne" class="selected-arrow">-->
+<!--              <Opener degree="0" edge="18" color="#fff"/>-->
+<!--            </div>-->
+<!--            <span class="float-font"-->
+<!--                  @click="e => {selectOne(module.name)}">{{`${moduleIndex+1}`}}. {{$t(`vision.${module.name}`)}}</span>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
 
     <div style="position: absolute; top: 0; right: 0; display: flex; margin: 5px;">
       <div style="width: 24px; height: 24px; margin-left: 5px; cursor: pointer;">
@@ -426,7 +471,7 @@ export default {
 
     const clickMenuOption = option => {
       if (option === 'createNode') {
-        createNode(selectedOne.value, cursorRecord.iCoordinate.x, cursorRecord.iCoordinate.y, modulesMapper.get(selectedOne.value))
+        // createNode(selectedOne.value, cursorRecord.iCoordinate.x, cursorRecord.iCoordinate.y, modulesMapper.get(selectedOne.value))
       } else if (option === 'removeNode') {
         removeNode(menu.nodeUid)
       } else if (option === 'switchLang') {
@@ -444,8 +489,8 @@ export default {
     const mousedownOnGraph = e => {
       cursorRecord.buttons = e.buttons
       cursorRecord.area = 0
-      cursorRecord.iCoordinate.x = e.offsetX
-      cursorRecord.iCoordinate.y = e.offsetY
+      cursorRecord.iCoordinate.x = e.pageX
+      cursorRecord.iCoordinate.y = e.pageY
       if (e.buttons === 1) {
         closeMenu();
       }
@@ -453,18 +498,19 @@ export default {
     const mousemoveOnGraph = e => {
       if (cursorRecord.iTask === 101 && e.buttons === 1) {
         const uid = cursorRecord.iNode
-        shapes[uid].x = cursorRecord.iNodeCoordinate.x + e.offsetX - cursorRecord.iCoordinate.x;
-        shapes[uid].y = cursorRecord.iNodeCoordinate.y + e.offsetY - cursorRecord.iCoordinate.y;
+        shapes[uid].x = cursorRecord.iNodeCoordinate.x + e.pageX - cursorRecord.iCoordinate.x;
+        shapes[uid].y = cursorRecord.iNodeCoordinate.y + e.pageY - cursorRecord.iCoordinate.y;
+        // console.info(`mousemove on graph ${cursorRecord.iCoordinate.x} ${cursorRecord.iCoordinate.y}; node record: ${cursorRecord.iNodeCoordinate.x} ${cursorRecord.iNodeCoordinate.y}`)
       } else if (cursorRecord.iTask === 102 && e.buttons === 1) {
-        iWire.x = e.offsetX
-        iWire.y = e.offsetY
+        iWire.x = iWire.iCoordinate.x + e.pageX - cursorRecord.iCoordinate.x
+        iWire.y = iWire.iCoordinate.y + e.pageY - cursorRecord.iCoordinate.y
       }
     }
     const mouseupOnGraph = e => {
-      if (cursorRecord.buttons === 2 && (cursorRecord.iCoordinate.x === e.offsetX && cursorRecord.iCoordinate.y === e.offsetY)) {
+      if (cursorRecord.buttons === 2 && (cursorRecord.iCoordinate.x === e.pageX && cursorRecord.iCoordinate.y === e.pageY)) {
         openMenu(e);
       } else {
-        if (cursorRecord.buttons === 1 && (cursorRecord.iCoordinate.x === e.offsetX && cursorRecord.iCoordinate.y === e.offsetY)) {
+        if (cursorRecord.buttons === 1 && (cursorRecord.iCoordinate.x === e.pageX && cursorRecord.iCoordinate.y === e.pageY)) {
           setDockerVisible(false)
         }
         closeMenu();
@@ -472,7 +518,7 @@ export default {
       cursorRecord.buttons = -1
     }
     const mouseupOnNode = (e, uid) => {
-      if (cursorRecord.buttons === 2 && cursorRecord.area === 1 && (cursorRecord.iCoordinate.x === e.offsetX && cursorRecord.iCoordinate.y === e.offsetY)) {
+      if (cursorRecord.buttons === 2 && cursorRecord.area === 1 && (cursorRecord.iCoordinate.x === e.pageX && cursorRecord.iCoordinate.y === e.pageY)) {
         e.stopPropagation()
         openMenu(e, uid)
         cursorRecord.buttons = -1
@@ -486,8 +532,8 @@ export default {
     const mouseupOnWindow = e => {
       if (cursorRecord.iTask === 101) {
         const uid = cursorRecord.iNode
-        shapes[uid].x = cursorRecord.iNodeCoordinate.x + e.offsetX - cursorRecord.iCoordinate.x;
-        shapes[uid].y = cursorRecord.iNodeCoordinate.y + e.offsetY - cursorRecord.iCoordinate.y;
+        shapes[uid].x = cursorRecord.iNodeCoordinate.x + e.pageX - cursorRecord.iCoordinate.x;
+        shapes[uid].y = cursorRecord.iNodeCoordinate.y + e.pageY - cursorRecord.iCoordinate.y;
       } else if (cursorRecord.iTask === 102) {
         iWire.using = false;
       }
@@ -502,8 +548,9 @@ export default {
       }
       cursorRecord.buttons = e.buttons
       cursorRecord.area = 1
-      cursorRecord.iCoordinate.x = e.offsetX
-      cursorRecord.iCoordinate.y = e.offsetY
+      cursorRecord.iCoordinate.x = e.pageX
+      cursorRecord.iCoordinate.y = e.pageY
+      // console.info(`mousedown on node ${cursorRecord.iCoordinate.x} ${cursorRecord.iCoordinate.y}`)
       if (e.buttons === 1) {
         cursorRecord.iTask = 101
         cursorRecord.iNode = uid
@@ -519,8 +566,8 @@ export default {
     const mousedownOnPort = (e, uid, portIndex, x, y) => {
       cursorRecord.buttons = e.buttons
       cursorRecord.area = 2
-      cursorRecord.iCoordinate.x = e.offsetX
-      cursorRecord.iCoordinate.y = e.offsetY
+      cursorRecord.iCoordinate.x = e.pageX
+      cursorRecord.iCoordinate.y = e.pageY
       if (e.buttons === 1) {
         cursorRecord.iTask = 102
         iWire.iCoordinate.x = x
@@ -546,6 +593,20 @@ export default {
     }
 
 
+    const dragState = ref('')
+    const dragOne = one => {
+      if (one === undefined) {
+        dragState.value = ''
+      } else {
+        dragState.value = one
+      }
+    }
+    const dropSelectedOne = e => {
+      if (dragState.value !== '')
+        createNode(dragState.value, e.offsetX, e.offsetY, modulesMapper.get(dragState.value))
+      dragState.value = ''
+      e.preventDefault()
+    }
 
     /**
      * 2.
@@ -590,6 +651,8 @@ export default {
       iWire,
       mouseupOnPort,
       mousedownOnPort,
+
+      dragState, dragOne, dropSelectedOne,
     }
   }
 
@@ -606,26 +669,35 @@ export default {
 @font-face {  font-family: Roboto;  font-weight: bold;    font-style: normal;  src: url("../font/RobotoBold-Xdoj.ttf");  }
 @font-face {  font-family: Roboto;  font-weight: bold;    font-style: italic;  src: url("../font/RobotoBoldItalic-4e0x.ttf");  }
 
+/*::-webkit-scrollbar {*/
+/*  width: 0;*/
+/*  height: 0;*/
+/*}*/
+
+/*::-webkit-scrollbar-corner {*/
+/*  background-color: transparent;*/
+/*}*/
+
+/*::-webkit-scrollbar-thumb {*/
+/*  background-color: rgba(230, 230, 230, 1);*/
+/*  background-clip: padding-box;*/
+/*  border: solid transparent;*/
+/*  border-radius: 10px;*/
+/*}*/
+
+/*::-webkit-scrollbar-track {*/
+/*  background-clip: padding-box;*/
+/*  border: 1px solid transparent;*/
+/*  !*border: none;*!*/
+/*}*/
+
 ::-webkit-scrollbar {
-  width: 0;
-  height: 0;
+  display: none;
 }
 
-::-webkit-scrollbar-corner {
-  background-color: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background-color: rgba(230, 230, 230, 1);
-  background-clip: padding-box;
-  border: solid transparent;
-  border-radius: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background-clip: padding-box;
-  border: 1px solid transparent;
-  /*border: none;*/
+* {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
 
 .top-layer {

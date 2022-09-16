@@ -1,13 +1,16 @@
 <template>
-  <VisionGraph />
+<!--  <VisionGraph />-->
+  <VisionHome />
 </template>
 
 <script>
 import VisionGraph from "@/workflow/VisionGraph";
+import VisionHome from "@/workflow/VisionHome";
 
 export default {
   name: 'App',
   components: {
+    VisionHome,
     VisionGraph,
   }
 }

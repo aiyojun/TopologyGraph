@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="480" height="480" viewBox="0 0 480 480" fill="none">
+    <defs>
+        <rect id="path_0" x="0" y="0" width="480" height="480" />
+        <linearGradient id="linear_0" x1="17.695%" y1="10.679%" x2="77.716%" y2="97.637%" gradientUnits="objectBoundingBox">
+            <stop offset="0" stop-color="#D14AA4" stop-opacity="1" /><stop offset="1" stop-color="#497AEA" stop-opacity="1" />
+        </linearGradient>
+        <filter id="filter_2" x="6" y="13" width="468.75" height="454.5" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+            <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+            <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"/>
+            <feOffset dx="0" dy="2"/>
+            <feGaussianBlur stdDeviation="10"/>
+            <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+            <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_Shadow"/>
+            <feBlend mode="normal" in="SourceGraphic" in2="effect1_Shadow" result="shape"/>
+        </filter>
+    </defs>
+    <g opacity="1" transform="translate(0 0)  rotate(0 240 240)">
+        <mask id="bg-mask-0" fill="white">
+            <use xlink:href="#path_0"></use>
+        </mask>
+        <g mask="url(#bg-mask-0)" >
+            <g id="并集" filter="url(#filter_2)">
+                <path id="并集" fill-rule="evenodd" fill="url(#linear_0)" transform="translate(10 17)  rotate(0 230.375 223.25)" opacity="1" d="M308.141 52.8734C275.477 20.2055 230.349 0 180.5 0C80.81 0 0 80.81 0 180.5C0 280.19 80.81 361 180.5 361C223.735 361 263.419 345.8 294.5 320.453L294.5 446.5L361 446.5L361 223.25L460.75 223.25L460.75 156.75L194.75 156.75L194.75 223.25L286.213 223.25C269.302 265.028 228.342 294.5 180.5 294.5C117.54 294.5 66.5 243.46 66.5 180.5C66.5 117.54 117.54 66.5 180.5 66.5C211.984 66.5 240.487 79.263 261.117 99.8972L308.141 52.8734Z " />
+            </g>
+        </g>
+    </g>
+</svg>
